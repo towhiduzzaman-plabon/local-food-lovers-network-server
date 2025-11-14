@@ -64,7 +64,7 @@ app.use('/api/favorites', favoriteRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/purchases', purchaseRoutes);
 
-// 404 for unknown API
+// 404 
 app.use('/api', (_req, res) => res.status(404).json({ message: 'Not found' }));
 
 // Global error handler
@@ -80,7 +80,7 @@ async function bootstrap() {
   await initDB();
 
   if (!process.env.VERCEL) {
-    // Local dev
+    
     app.listen(PORT, () => {
       console.log(`Server running on http://localhost:${PORT}`);
       console.log(`CORS allow: ${ALLOWED_ORIGINS.join(', ')}`);
