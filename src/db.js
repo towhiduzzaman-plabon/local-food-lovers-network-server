@@ -1,4 +1,3 @@
-// server/db.js
 import { MongoClient, ServerApiVersion } from 'mongodb';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -43,6 +42,6 @@ export async function connectDB() {
 export async function initDB() {
   await connectDB();
   await client.db(DB_NAME).command({ ping: 1 });
-  console.log(`✅Pinged your deployment.You Successfully connected to MongoDB
+  console.log(`Pinged your deployment.You Successfully connected to MongoDB
      → db: ${DB_NAME} (collections: ${REVIEWS_COLL}, ${FAVORITES_COLL})`);
 }

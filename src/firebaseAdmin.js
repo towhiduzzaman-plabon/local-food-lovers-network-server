@@ -4,7 +4,7 @@ const projectId   = process.env.FIREBASE_PROJECT_ID;
 const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
 const rawKey      = process.env.FIREBASE_PRIVATE_KEY;
 
-// dev-এ স্পষ্ট বার্তা
+
 if (!projectId || !clientEmail || !rawKey) {
   console.error('❌ Missing FIREBASE_* env vars. Check your server/.env');
 }
@@ -19,7 +19,7 @@ if (!admin.apps.length) {
       privateKey,
     }),
   });
-  console.log('✅ Firebase Admin initialized');
+  console.log('Firebase Admin initialized');
 }
 
 export async function verifyFirebaseIdToken(idToken) {
