@@ -85,7 +85,7 @@ router.get('/:id', async (req, res) => {
   res.json(normalize(doc));
 });
 
-// ---------- Update (Protected, only owner) ----------
+// ---- Update (Protected, only owner) ------
 router.put('/:id', verifyJWT, async (req, res) => {
   const { Reviews } = await connectDB();
   const _id = new ObjectId(req.params.id);
