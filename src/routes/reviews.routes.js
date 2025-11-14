@@ -13,7 +13,7 @@ const normalize = (d) => ({
   ...d,
   rating: d.rating ?? d.starRating ?? 0,
   createdAt: d.createdAt ?? d.date ?? new Date(),
-  foodImage: d.foodImage || FALLBACK_IMG, // ✅ সার্ভার-লেভেল fallback
+  foodImage: d.foodImage || FALLBACK_IMG,
 });
 
 // ---------- Create (Protected) ----------

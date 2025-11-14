@@ -1,4 +1,4 @@
-// server/index.js
+// server/src/index.js
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
@@ -7,7 +7,7 @@ import morgan from 'morgan';
 import dotenv from 'dotenv';
 dotenv.config();
 
-// DEV only: self-signed TLS allow (যদি .env এ ALLOW_INSECURE_TLS=true থাকে)
+// DEV only: self-signed TLS allow
 if (process.env.ALLOW_INSECURE_TLS === 'true') {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 }
@@ -34,7 +34,7 @@ app.use(morgan('dev'));
 // CORS (credentials সহ)
 const corsOptions = {
   origin(origin, cb) {
-    if (!origin) return cb(null, true); // mobile app/curl
+    if (!origin) return cb(null, true); // curl/mobile
     const ok = ALLOWED_ORIGINS.includes(origin);
     cb(ok ? null : new Error('CORS blocked'), ok ? true : undefined);
   },
@@ -46,11 +46,19 @@ app.options('*', cors(corsOptions));
 app.use(express.json({ limit: '1mb' }));
 app.use(cookieParser());
 
-// Health
-app.get('/api/ping', (_req, res) => res.json({ ok: true }));
-app.get('/api/health', (_req, res) => res.json({ ok: true, db: true, port: PORT }));
+// ---------- Root & Health ----------
+app.get('/', (_req, res) => {
+  res
+    .type('text')
+    .send('Local Food Lovers API is running. Try /api/health or /api/ping');
+});
 
-// Routes
+app.get('/api/ping', (_req, res) => res.json({ ok: true }));
+app.get('/api/health', (_req, res) =>
+  res.json({ ok: true, db: true, port: PORT })
+);
+
+// ---------- API Routes ----------
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/favorites', favoriteRoutes);
 app.use('/api/auth', authRoutes);
@@ -67,15 +75,21 @@ app.use((err, _req, res, _next) => {
   res.status(status).json({ message: msg, ...(isDev && { stack: err.stack }) });
 });
 
-// Start after DB init
-initDB()
-  .then(() => {
+
+async function bootstrap() {
+  await initDB();
+
+  if (!process.env.VERCEL) {
+    // Local dev
     app.listen(PORT, () => {
-      console.log(`🚀 Server running on http://localhost:${PORT}`);
-      console.log(`✅ CORS allow: ${ALLOWED_ORIGINS.join(', ')}`);
+      console.log(`Server running on http://localhost:${PORT}`);
+      console.log(`CORS allow: ${ALLOWED_ORIGINS.join(', ')}`);
     });
-  })
-  .catch((err) => {
-    console.error('❌ Failed to connect MongoDB on startup:', err.message);
-    process.exit(1);
-  });
+  }
+}
+bootstrap().catch((err) => {
+  console.error('❌ Startup failed:', err);
+  process.exit(1);
+});
+
+export default app;

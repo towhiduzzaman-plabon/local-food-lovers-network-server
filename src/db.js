@@ -17,7 +17,6 @@ const allowInsecure = process.env.ALLOW_INSECURE_TLS === 'true';
 const client = new MongoClient(process.env.MONGODB_URI, {
   // Atlas stable API
   serverApi: { version: ServerApiVersion.v1, strict: true, deprecationErrors: true },
-  // Local/Corp proxy dev এ সার্টিফিকেট ইস্যু এড়াতে (শুধু dev!)
   tlsAllowInvalidCertificates: allowInsecure,
   tlsAllowInvalidHostnames: allowInsecure,
   // connection stability
@@ -44,5 +43,6 @@ export async function connectDB() {
 export async function initDB() {
   await connectDB();
   await client.db(DB_NAME).command({ ping: 1 });
-  console.log(`✅ MongoDB connected → db: ${DB_NAME} (collections: ${REVIEWS_COLL}, ${FAVORITES_COLL})`);
+  console.log(`✅Pinged your deployment.You Successfully connected to MongoDB
+     → db: ${DB_NAME} (collections: ${REVIEWS_COLL}, ${FAVORITES_COLL})`);
 }
