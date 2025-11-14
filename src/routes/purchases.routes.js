@@ -4,17 +4,12 @@ import { connectDB } from '../db.js';
 import { verifyJWT } from '../middleware/verifyJWT.js';
 
 const router = Router();
-
-/**
- * POST /api/purchases
- * body: { reviewId }
- * effect: save a purchase snapshot for the logged-in user
- */
+// ---------- Create Purchase (Protected) ----------
 router.post('/', verifyJWT, async (req, res) => {
   const { db } = await connectDB();
   const Purchases = db.collection('purchases');
 
-  // ✅ reviewId normalize (string বা {$oid: ...}—সব কেসে)
+// validate reviewId
   let reviewIdRaw = req.body?.reviewId;
   if (reviewIdRaw && typeof reviewIdRaw === 'object' && reviewIdRaw.$oid) {
     reviewIdRaw = reviewIdRaw.$oid;
@@ -24,7 +19,7 @@ router.post('/', verifyJWT, async (req, res) => {
   }
   const _id = new ObjectId(String(reviewIdRaw));
 
-  // ✅ প্রথমে 'reviews' কালেকশনে খুঁজো, না পেলে 'food_details'
+  // check if review/food exists..
   let review = await db.collection('reviews').findOne({ _id });
   if (!review) {
     review = await db.collection('food_details').findOne({ _id });
@@ -46,10 +41,8 @@ router.post('/', verifyJWT, async (req, res) => {
   res.json({ _id: result.insertedId, ...doc, purchased: true });
 });
 
-/**
- * GET /api/purchases/mine
- * return all purchases for the logged-in user
- */
+
+ // ---------- Get My Purchases (Protected) ----------
 router.get('/mine', verifyJWT, async (req, res) => {
   const { db } = await connectDB();
   const items = await db
@@ -78,7 +71,7 @@ router.delete('/:id', verifyJWT, async (req, res) => {
   const purchase = await Purchases.findOne({ _id });
   if (!purchase) return res.status(404).json({ message: 'Purchase not found' });
 
-  // শুধুই নিজের কেনা হলে ক্যানসেল করা যাবে
+  // only owner can cancel
   if (purchase.userEmail !== req.user.email) {
     return res.status(403).json({ message: 'Forbidden' });
   }
