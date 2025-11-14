@@ -8,7 +8,7 @@ const router = Router();
 const FALLBACK_IMG =
   'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?q=80&w=1200&auto=format&fit=crop';
 
-// normalize: DB ডক -> অ্যাপ শেইপ (rating/createdAt নিশ্চিত)
+// ---------- Data Normalization ----------
 const normalize = (d) => ({
   ...d,
   rating: d.rating ?? d.starRating ?? 0,
